@@ -1,0 +1,10 @@
+Meilleur modele : XGBoost
+
+              precision    recall  f1-score   support
+
+       Reste       0.88      0.77      0.82      1035
+       Churn       0.53      0.71      0.61       374
+
+    accuracy                           0.76      1409
+   macro avg       0.71      0.74      0.72      1409
+weighted avg       0.79      0.76      0.77      1409

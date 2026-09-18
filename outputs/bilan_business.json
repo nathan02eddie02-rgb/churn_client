@@ -1,0 +1,29 @@
+{
+  "parametres": {
+    "seuil_probabilite": 0.5,
+    "cout_par_contact": 15,
+    "taux_succes_campagne": 0.35,
+    "horizon_mois": 12
+  },
+  "n_clients_total": 1409,
+  "taux_churn_global": 0.2654,
+  "n_clients_cibles": 501,
+  "n_vrais_positifs": 267,
+  "n_faux_positifs": 234,
+  "precision_ciblage_modele": 0.5329,
+  "avec_modele": {
+    "budget_campagne_usd": 7515.0,
+    "clients_sauves_estimes": 93.4,
+    "revenu_recupere_usd": 83754.72,
+    "profit_net_usd": 76239.72,
+    "roi_pct": 1014.5
+  },
+  "sans_modele_ciblage_aleatoire": {
+    "budget_campagne_usd": 7515.0,
+    "clients_sauves_estimes": 46.5,
+    "revenu_recupere_usd": 35795.64,
+    "profit_net_usd": 28280.64,
+    "roi_pct": 376.3
+  },
+  "gain_efficacite_modele_vs_aleatoire_usd": 47959.08
+}

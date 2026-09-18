@@ -1,0 +1,16 @@
+,0
+Contract_Two year,0.3328775
+PaymentMethod_Electronic check,0.11185327
+Contract_One year,0.095539786
+InternetService_Fiber optic,0.08869835
+InternetService_No,0.067786485
+StreamingMovies_Yes,0.04337981
+tenure,0.03197749
+Dependents,0.028216606
+PhoneService,0.027318586
+MultipleLines_Yes,0.023118911
+StreamingTV_Yes,0.01995573
+PaymentMethod_Credit card (automatic),0.015711322
+PaperlessBilling,0.013530242
+TechSupport_Yes,0.012624096
+PaymentMethod_Mailed check,0.0122118555
