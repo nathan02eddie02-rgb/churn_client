@@ -1,5 +1,7 @@
 # Projet Churn Client — De A à Z
 
+![Résumé du projet](outputs/resume_projet_churn.png)
+
 Projet complet de prédiction du churn client (attrition), avec comparaison de 4 modèles
 de Machine Learning, gestion du déséquilibre des classes, normalisation, et une simulation
 business réelle (bilan financier d'une campagne de rétention) restituée dans un dashboard.
@@ -29,7 +31,8 @@ churn_project/
 │   ├── preprocessing.py                # nettoyage, encodage, normalisation, split
 │   ├── train_models.py                 # entraînement + comparaison des 4 modèles + SMOTE
 │   ├── business_simulation.py          # simulation financière de la campagne de rétention
-│   └── generate_static_dashboard.py    # génère un dashboard HTML autonome (Plotly)
+│   ├── generate_static_dashboard.py    # génère un dashboard HTML autonome (Plotly)
+│   └── make_summary_image.py           # génère l'image de synthèse du projet (PNG et JPEG)
 ├── models/
 │   ├── best_model.joblib               # meilleur modèle (XGBoost) sauvegardé
 │   ├── scaler.joblib / encoders.joblib / feature_names.joblib
@@ -41,9 +44,13 @@ churn_project/
 │   ├── importance_variables.csv/.png
 │   ├── bilan_business.json/.png        # bilan financier de la campagne
 │   ├── predictions_test_set.csv
+│   ├── resume_projet_churn.png / .jpg  # tableau de synthèse du projet
 │   └── dashboard_nextel.html           # dashboard exportable, un seul fichier
-├── dashboard/
-│   └── app.py                          # dashboard interactif Streamlit
+├── dashboard/                          # application Streamlit en 4 sections
+│   ├── app.py                          # point d'entrée et navigation
+│   ├── theme.py / data.py              # identité visuelle, chargement des données en cache
+│   ├── views/                          # problematique.py, dataset.py, kpi.py, predictions.py
+│   └── .streamlit/config.toml          # thème (couleurs)
 ├── notebooks/
 │   └── projet_churn_client.ipynb       # notebook complet (EDA -> ML -> business), exécuté
 ├── requirements.txt
@@ -51,7 +58,18 @@ churn_project/
 └── README.md
 ```
 
-## 3. Installation et exécution
+## 3. Le dashboard Streamlit
+
+L'application est organisée en quatre sections :
+
+| Section | Contenu |
+|---|---|
+| Problématique | Enjeu du churn, question posée, coût des départs, démarche, résultat en bref |
+| Dataset | Description du jeu Telco, aperçu filtrable, dictionnaire des variables, préparation (nettoyage, encodage, normalisation, SMOTE) |
+| Visualisations KPI | Churn par contrat, internet, ancienneté et paiement ; performance des 4 modèles ; bilan financier interactif de la campagne |
+| Prédictions | Score de départ d'un client avec facteurs explicatifs et pistes d'action, liste des clients à risque, scoring d'un fichier CSV |
+
+## 4. Installation et exécution
 
 ```bash
 pip install -r requirements.txt
@@ -68,12 +86,16 @@ python business_simulation.py
 python generate_static_dashboard.py
 # -> ouvre outputs/dashboard_nextel.html dans un navigateur
 
-# 4) OU lancer le dashboard interactif Streamlit
+# 4) Lancer le dashboard interactif Streamlit (depuis le dossier dashboard/)
 cd ../dashboard
 streamlit run app.py
+
+# 5) Régénérer l'image de synthèse du projet
+cd ../src
+python make_summary_image.py
 ```
 
-## 4. Résultats obtenus (échantillon de test, 1 409 clients)
+## 5. Résultats obtenus (échantillon de test, 1 409 clients)
 
 | Modèle | Accuracy | Précision | Rappel | F1-score | ROC-AUC |
 |---|---|---|---|---|---|
@@ -85,7 +107,7 @@ streamlit run app.py
 **XGBoost** est retenu car il offre le meilleur ROC-AUC (pouvoir de discrimination global),
 un critère plus robuste que la simple accuracy sur un problème déséquilibré (~26,5% de churn).
 
-## 5. Cas d'usage métier — NexTel (scénario par défaut)
+## 6. Cas d'usage métier — NexTel (scénario par défaut)
 
 Hypothèses : seuil de ciblage = 50%, coût de contact = 15$/client, taux de succès de la
 campagne = 35%, horizon de valeur = 12 mois.
@@ -104,9 +126,9 @@ de sa **précision de ciblage** (53,3% de vrais clients à risque parmi les clie
 contre 26,5% en ciblage aléatoire).
 
 Tous les paramètres (seuil, coût, taux de succès, horizon) sont ajustables dynamiquement
-dans le dashboard Streamlit (`dashboard/app.py`).
+dans la section Visualisations KPI du dashboard Streamlit.
 
-## 6. Notebook
+## 7. Notebook
 
 Le notebook `notebooks/projet_churn_client.ipynb` reprend l'ensemble de la démarche de façon
 narrative et exécutée (EDA, nettoyage, encodage, normalisation, SMOTE, entraînement des 4
@@ -117,7 +139,7 @@ présenter ou modifier le projet pas à pas.
 jupyter notebook notebooks/projet_churn_client.ipynb
 ```
 
-## 7. Limites et pistes d'amélioration
+## 8. Limites et pistes d'amélioration
 - Le taux de succès de campagne (35%) et le coût de contact (15$) sont des hypothèses de
   travail à calibrer avec des données réelles de campagnes passées.
 - Un réglage fin des hyperparamètres (GridSearch/Optuna) et un seuil de décision optimisé

@@ -40,7 +40,7 @@ SIMULATION_PARAMS = {
 def get_business_dataframe():
     """Reconstruit le jeu de test avec les montants originaux (non normalises)
     et les probabilites de churn predites par le meilleur modele."""
-    X_train, X_test, y_train, y_test, encoders, scaler, feature_names = build_dataset()
+    X_train, X_test, y_train, y_test, encoders, scaler, feature_names = build_dataset(save_artifacts=False)
 
     raw = load_raw_data()
     clean = clean_data(raw)
@@ -49,7 +49,9 @@ def get_business_dataframe():
     proba = best_model.predict_proba(X_test)[:, 1]
     pred = best_model.predict(X_test)
 
-    business_df = clean.loc[X_test.index, ["tenure", "MonthlyCharges", "TotalCharges", "Contract"]].copy()
+    business_df = clean.loc[X_test.index, ["tenure", "MonthlyCharges", "TotalCharges", "Contract",
+                                           "InternetService", "PaymentMethod"]].copy()
+    business_df.insert(0, "customerID", raw.loc[X_test.index, "customerID"].values)
     business_df["Churn_reel"] = y_test.values
     business_df["Churn_proba"] = proba
     business_df["Churn_predit"] = pred

@@ -91,7 +91,7 @@ def scale_features(df, fit=True, scaler=None, numeric_cols=NUMERIC_COLS):
     return df, scaler
 
 
-def build_dataset(path=DATA_PATH, test_size=0.2, random_state=42):
+def build_dataset(path=DATA_PATH, test_size=0.2, random_state=42, save_artifacts=True):
     """
     Pipeline complet : charge, nettoie, encode, normalise, split.
     Retourne X_train, X_test, y_train, y_test, encoders, scaler, feature_names
@@ -111,12 +111,50 @@ def build_dataset(path=DATA_PATH, test_size=0.2, random_state=42):
     X_train_scaled, scaler = scale_features(X_train, fit=True)
     X_test_scaled, _ = scale_features(X_test, fit=False, scaler=scaler)
 
-    os.makedirs(MODELS_DIR, exist_ok=True)
-    joblib.dump(encoders, os.path.join(MODELS_DIR, "encoders.joblib"))
-    joblib.dump(scaler, os.path.join(MODELS_DIR, "scaler.joblib"))
-    joblib.dump(list(X.columns), os.path.join(MODELS_DIR, "feature_names.joblib"))
+    if save_artifacts:
+        os.makedirs(MODELS_DIR, exist_ok=True)
+        joblib.dump(encoders, os.path.join(MODELS_DIR, "encoders.joblib"))
+        joblib.dump(scaler, os.path.join(MODELS_DIR, "scaler.joblib"))
+        joblib.dump(list(X.columns), os.path.join(MODELS_DIR, "feature_names.joblib"))
 
     return X_train_scaled, X_test_scaled, y_train, y_test, encoders, scaler, list(X.columns)
+
+
+def load_artifacts():
+    """Charge le meilleur modèle et les objets de prétraitement sauvegardés."""
+    model = joblib.load(os.path.join(MODELS_DIR, "best_model.joblib"))
+    encoders = joblib.load(os.path.join(MODELS_DIR, "encoders.joblib"))
+    scaler = joblib.load(os.path.join(MODELS_DIR, "scaler.joblib"))
+    feature_names = joblib.load(os.path.join(MODELS_DIR, "feature_names.joblib"))
+    return model, encoders, scaler, feature_names
+
+
+def prepare_input(df_raw, encoders, scaler, feature_names):
+    """
+    Transforme des clients au format brut (colonnes du CSV Telco) en matrice
+    prête pour le modèle : mêmes encodages, mêmes colonnes, même normalisation
+    que lors de l'entraînement.
+    """
+    df = df_raw.copy()
+    df = df.drop(columns=[c for c in ("customerID", TARGET_COL) if c in df.columns])
+    df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce").fillna(0)
+
+    for col, le in encoders.items():
+        df[col] = le.transform(df[col].astype(str))
+
+    X = pd.DataFrame(0.0, index=df.index, columns=feature_names)
+    for col in df.columns:
+        if col in X.columns:
+            X[col] = df[col].astype(float)
+        else:  # variable multi-catégories -> colonne one-hot "variable_valeur"
+            values = df[col].astype(str)
+            for val in values.unique():
+                name = f"{col}_{val}"
+                if name in X.columns:
+                    X.loc[values == val, name] = 1.0
+
+    X[NUMERIC_COLS] = scaler.transform(X[NUMERIC_COLS])
+    return X
 
 
 if __name__ == "__main__":

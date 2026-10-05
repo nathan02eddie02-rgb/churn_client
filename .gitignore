@@ -9,8 +9,8 @@ venv/
 .venv/
 env/
 
-# Streamlit
-.streamlit/
+# Streamlit (la config de theme est versionnee, pas les secrets)
+.streamlit/secrets.toml
 
 # OS
 .DS_Store
